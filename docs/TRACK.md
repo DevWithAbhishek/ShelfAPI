@@ -94,28 +94,11 @@
 
     **Note**: *Since the PostgreSQL server is running in a Docker container, the hostname/address would be the name of the Docker service for the database container as defined in the docker-compose.yml file. By default, the name of the service becomes the hostname/address of the container within the Docker network.*
 
-7. Connecting to PostgreSQL Server from NestJS
-    - npm install --save @nestjs/typeorm typeorm pg
-    - in the app.module.ts file, add the following code in the imports array:
-        ```
-            TypeOrmModule.forRoot({
-                type: 'postgres',
-                host: 'db',
-                port: 5432,
-                username: 'postgres',
-                password: 'postgres',
-                database: 'postgres',
-                entities: [],
-                synchronize: true,
-                autoLoadEntities: true,
-            }),
-        ```
-
-8. Set node types
+7. Set node types
     - npm i --save-dev @types/node 
     - types: ["node"] in tsconfig
 
-9. Rebuild docker image on node module changes:
+8. Rebuild docker image on node module changes:
     - docker compose down
     - docker compose up --build --pull always
 
@@ -129,3 +112,18 @@
 ---
 
 ## Day 2: 
+
+1. **Error in dto:** Property 'password' has no initializer and is not definitely assigned in the constructor
+    - Fix: set "strictPropertyInitialization": false in tsconfig.
+
+2. Install Prisma
+    - npm install prisma --save-dev
+    - npx prisma
+    - npx prisma init
+    - Add DATABASE_URL: 
+        - Structure: postgresql://USERNAME:PASSWORD@HOST:PORT/DATABASE_NAME?OPTIONS
+        - URL: postgresql://postgres:postgres@localhost:5432/postgres?schema=public
+    - Run **npx prisma db pull** to introspect your database.
+
+3. Create config module to read .env variables
+    - npm i --save @nestjs/config
