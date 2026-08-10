@@ -144,7 +144,7 @@ Body: {
 
 ---
 ### DELETE - /docs
-Delete a doc.
+Delete all docs.
 
 Body: None  
 200: {
