@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
+import { DocsController } from './docs.controller';
+import { DocsService } from './docs.service';
+import { PrismaService } from '../prisma.service';
 
-@Module({})
-export class DocsModule {
-    // providers: [
-    //     {
-    //         provide: APP_GUARD,
-    //         useClass: AuthGuard,
-    //     },
-    // ],
-}
+@Module({
+  controllers: [DocsController],
+  providers: [DocsService, PrismaService]
+})
+export class DocsModule {}

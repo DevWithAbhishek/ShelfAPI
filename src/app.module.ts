@@ -11,10 +11,13 @@ import { UsersService } from './users/users.service';
 import { AuthService } from './auth/auth.service';
 import { PrismaService } from './prisma.service';
 import { ConfigModule } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { DocsService } from './docs/docs.service';
+import { DocsController } from './docs/docs.controller';
 
 @Module({
-  imports: [UsersModule, DocsModule, HealthModule, AuthModule,ConfigModule.forRoot({isGlobal: true})],
-  controllers: [AppController, AuthController, UsersController],
-  providers: [AppService, UsersService, AuthService, PrismaService],
+  imports: [UsersModule, DocsModule, HealthModule, AuthModule,ConfigModule.forRoot({isGlobal: true}), DocsModule],
+  controllers: [AppController, AuthController, UsersController, DocsController],
+  providers: [AppService, UsersService, AuthService, PrismaService, JwtService, DocsService],
 })
 export class AppModule {}
