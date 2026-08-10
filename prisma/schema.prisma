@@ -1,13 +1,93 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model User {
+  id              String     @id @default(uuid())
+  email           String     @unique
+  username        String
+  hashed_password String
+  sessions        Session[]
+  docs            Document[]
+  tags  Tag[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Session {
+  id                 String  @id @default(uuid())
+  family             String
+  token_hash String
+  ip                 String?
+  user_agent         String?
+  last_seen_ip       String?
+  last_seen_at       DateTime @default(now())
+  revoked_at         DateTime?
+
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  expires_at DateTime
+  created_at DateTime @default(now())
+}
+
+model Document {
+  id          String       @id @default(uuid())
+  title       String
+  description String?
+  attachment  Attachment?
+  tags        TagsOnDocs[]
+
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([user_id, created_at])
+}
+
+model Tag {
+  id   String       @id @default(uuid())
+  name String
+  docs TagsOnDocs[]
+
+  user_id String
+  user    User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, name])
+}
+
+model Attachment {
+  id                String  @id @default(uuid())
+  s3_key            String  @unique
+  folder            String
+  original_filename String
+  mime_type         String
+  size_bytes        Int?
+  width             Int?
+  height            Int?
+  alt               String?
+
+  doc_id String   @unique
+  doc    Document @relation(fields: [doc_id], references: [id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model TagsOnDocs {
+  doc    Document @relation(fields: [doc_id], references: [id], onDelete: Cascade)
+  doc_id String
+
+  tag    Tag    @relation(fields: [tag_id], references: [id])
+  tag_id String
+
+  @@id([doc_id, tag_id])
+  @@index([tag_id])
 }

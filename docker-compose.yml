@@ -1,39 +1,62 @@
 services:
-  db: 
-    image: postgres
-    restart: always
+  db:
+    image: postgres:16
+    container_name: shelf-db
+    restart: unless-stopped
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    container_name: postgres
-    volumes:
-      - ./pgdata:/var/lib/postgresql
+      POSTGRES_DB: shelf
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - '5432:5432'
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d shelf"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  app:
-    build: 
-      context: .
-      dockerfile: Dockerfile
-    container_name: shelfAPI
-    environment:
-      - PORT=${PORT}
-    ports:
-      - '3000:3000'
-    depends_on:
-      - db
-    volumes:
-      - ./src:/app/src
+volumes:
+  pgdata:
+
+
+# services:
+#   db: 
+#     image: postgres
+#     restart: always
+#     environment:
+#       - POSTGRES_USER=postgres
+#       - POSTGRES_PASSWORD=postgres
+#     container_name: postgres
+#     volumes:
+#       - ./pgdata:/var/lib/postgresql
+#     ports:
+#       - '5432:5432'
+
+#   app:
+#     build: 
+#       context: .
+#       dockerfile: Dockerfile
+#     container_name: shelfAPI
+#     environment:
+#       - PORT=${PORT}
+#     ports:
+#       - '3000:3000'
+#     depends_on:
+#       - db
+#     volumes:
+#       - ./src:/app/src
 
   
-  pgadmin:
-    image: dpage/pgadmin4
-    restart: always
-    container_name: nest-pgadmin4
-    ports:
-      - '5050:80'
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-      - PGADMIN_DEFAULT_PASSWORD=pgadmin4
-    depends_on:
-      - db
+#   pgadmin:
+#     image: dpage/pgadmin4
+#     restart: always
+#     container_name: nest-pgadmin4
+#     ports:
+#       - '5050:80'
+#     environment:
+#       - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+#       - PGADMIN_DEFAULT_PASSWORD=pgadmin4
+#     depends_on:
+#       - db
