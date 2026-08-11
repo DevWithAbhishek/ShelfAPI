@@ -29,3 +29,9 @@ export class InvalidTokens extends AppBaseError{
         super(`Invalid tokens received`);
     }
 }
+
+export class FileMissing extends AppBaseError {
+    constructor() {
+        super(`No file found in request. Please check and try again`);
+    }
+}

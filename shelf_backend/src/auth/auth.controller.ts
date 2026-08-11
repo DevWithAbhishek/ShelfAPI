@@ -4,12 +4,10 @@ import {
   Post,
   Req,
   Res,
-  UseGuards,
   UsePipes,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
-import { AuthGuard } from './auth.guard';
 import {
   type loginDto,
   signup,
@@ -19,7 +17,7 @@ import { ZodValidationPipe } from '../common/schemas/zod.schema';
 import { authTokens } from './auth.dto';
 import { ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL } from './auth.constants';
 
-@Controller('auth')
+@Controller('api/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 

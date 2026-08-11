@@ -7,16 +7,22 @@ import {
   Post,
   Req,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { DocsService } from './docs.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { type Request, type Response } from 'express';
-import { type updateDocumentDto, type addDocumentDto } from '../common/schemas/schema.zod';
 import {
-  BadRequest,
+  type updateDocumentDto,
+  type addDocumentDto,
+} from '../common/schemas/schema.zod';
+import {
+  FileMissing,
   Unauthenticated,
 } from '../common/errors/errors-class.error';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 type AuthenticatedRequest = Request & {
   user?: {
@@ -70,7 +76,11 @@ export class DocsController {
 
   @Patch(':id')
   @UseGuards(AuthGuard)
-  async updateOne(@Req() req: AuthenticatedRequest, @Param('id') docId: string, data: updateDocumentDto) {
+  async updateOne(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') docId: string,
+    data: updateDocumentDto,
+  ) {
     const userId = req.user?.sub;
     if (!userId) throw new Unauthenticated();
 
@@ -90,6 +100,32 @@ export class DocsController {
     return {
       success: true,
       message: `Document: ${docId} deleted successfully`,
+    };
+  }
+
+  @Post(':id/attachments')
+  @UseGuards(AuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') docId: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const userId = req.user?.sub;
+    if (!userId) throw new Unauthenticated();
+
+    if (!file) throw new FileMissing();
+
+    const attachment = await this.docsService.uploadAttachment({
+      userId,
+      docId,
+      file,
+    });
+
+    return {
+      success: true,
+      message: 'Attachment uploaded successfully',
+      data: attachment,
     };
   }
 }

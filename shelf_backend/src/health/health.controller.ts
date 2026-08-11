@@ -2,7 +2,7 @@ import { Controller, Get, Req } from '@nestjs/common';
 import { HealthService } from './health.service';
 import { type Request } from 'express';
 
-@Controller('health')
+@Controller('api/health')
 export class HealthController {
     constructor(private healthService: HealthService) { }
     
